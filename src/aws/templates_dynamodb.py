@@ -43,6 +43,12 @@ def add_template(template):
     return resp
 
 
+def update_template(template):
+    table.put_item(
+        Item=template.to_dict()
+    )
+
+
 def get_template(template_id):
     response = table.get_item(
         Key={

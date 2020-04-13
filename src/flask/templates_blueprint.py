@@ -60,8 +60,7 @@ def save_template_file(template_id):
     template = Template.from_json(resp)
     templates_s3.save_file(template, request.json)
     template.parameters = mock_service.parse_template_parameters(request.json)
-    print(template.parameters)
-    templates_dynamodb.add_template(template)
+    templates_dynamodb.update_template(template)
     return jsonify(template)
 
 
