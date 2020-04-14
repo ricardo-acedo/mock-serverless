@@ -15,7 +15,7 @@ user_blueprint = Blueprint('users', __name__)
 def get_user(user_id):
     resp = users_dynamodb.get_user(user_id)
     if not resp:
-        log.error('User with id ' + user_id + ' does not exist')
+        log.error(f'User with id {user_id} does not exist')
         return jsonify({'error': 'User does not exist'}), http.HTTPStatus.NOT_FOUND
 
     return jsonify(User.from_json(resp))
@@ -30,7 +30,6 @@ def get_all_users():
 def create_user():
     try:
         user = User.from_dict(request.json)
-        print(user)
     except (KeyError, TypeError) as e:
         log.error('Error creating user', e)
         return jsonify({'error': 'Please provide at least a valid id'}), http.HTTPStatus.BAD_REQUEST
@@ -56,14 +55,14 @@ def delete_user(user_id):
     if resp:
         return '', http.HTTPStatus.NO_CONTENT
     else:
-        return jsonify({'error': 'The user does not exists'}), http.HTTPStatus.NOT_FOUND
+        return jsonify({'error': f'The user {user_id} does not exists'}), http.HTTPStatus.NOT_FOUND
 
 
 @user_blueprint.route("/users/<string:user_id>/reset",  methods=["POST"])
 def reset_user(user_id):
     resp = users_dynamodb.get_user(user_id)
     if not resp:
-        log.error('User with id ' + user_id + ' does not exist')
+        log.error(f'User with id {user_id} does not exist')
         return jsonify({'error': 'User does not exist'}), http.HTTPStatus.NOT_FOUND
 
     user = User.from_json(resp)

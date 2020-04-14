@@ -26,15 +26,15 @@ log = logging.getLogger()
 table = dynamodb.Table(TEMPLATES_TABLE)
 
 
-def query_path(path):
+def query_path(path, http_status):
     return table.query(
         IndexName=PATH_INDEX,
-        KeyConditionExpression=Key('path').eq(path)
-        )['Items']
+        KeyConditionExpression=Key('path').eq(path) & Key('httpStatus').eq(http_status)
+    )['Items']
 
 
 def add_template(template):
-    if query_path(template.path):
+    if query_path(template.path, template.httpStatus):
         return None
 
     resp = table.put_item(
@@ -62,6 +62,10 @@ def get_template(template_id):
 def get_all_templates():
     response = table.scan()
     return list(map(parse_json, response['Items']))
+
+
+def get_all_templates_path_index():
+    return table.scan(IndexName=PATH_INDEX)['Items']
 
 
 def delete_template(template_id):

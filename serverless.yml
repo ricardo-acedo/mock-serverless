@@ -55,7 +55,7 @@ provider:
 
 functions:
   app:
-    handler: wsgi.handler
+    handler: wsgi_handler.handler
     events:
       - http: ANY /
       - http: 'ANY {proxy+}'
@@ -83,6 +83,8 @@ resources:
             AttributeType: S
           - AttributeName: path
             AttributeType: S
+          - AttributeName: httpStatus
+            AttributeType: N
         KeySchema:
           - AttributeName: id
             KeyType: HASH
@@ -91,6 +93,8 @@ resources:
             KeySchema:
               - AttributeName: path
                 KeyType: HASH
+              - AttributeName: httpStatus
+                KeyType: RANGE
             Projection:
               ProjectionType: KEYS_ONLY
             ProvisionedThroughput:

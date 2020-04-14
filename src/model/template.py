@@ -17,4 +17,4 @@ class Template:
     parameters: List[str] = field(default_factory=list)
 
     def get_s3_location(self):
-        return self.context + '/' + self.name + '/' + str(self.httpStatus) + '/' + self.id + '.' + self.responseType
+        return f'{self.context}/{self.name}/{str(self.httpStatus)}/{self.id}.{self.responseType}'

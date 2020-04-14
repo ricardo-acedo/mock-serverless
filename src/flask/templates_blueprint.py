@@ -16,7 +16,7 @@ template_blueprint = Blueprint('templates', __name__)
 def get_template(template_id):
     resp = templates_dynamodb.get_template(template_id)
     if not resp:
-        log.error('Template with id ' + template_id + ' does not exist')
+        log.error(f'Template with id {template_id} does not exist')
         return jsonify({'error': 'Template does not exist'}), http.HTTPStatus.NOT_FOUND
 
     return jsonify(Template.from_json(resp))
@@ -54,7 +54,7 @@ def delete_template(template_id):
 def save_template_file(template_id):
     resp = templates_dynamodb.get_template(template_id)
     if not resp:
-        log.error('Template with id ' + template_id + ' does not exist')
+        log.error(f'Template with id {template_id} does not exist')
         return jsonify({'error': 'Template does not exist'}), http.HTTPStatus.NOT_FOUND
 
     template = Template.from_json(resp)
@@ -68,7 +68,7 @@ def save_template_file(template_id):
 def get_template_file(template_id):
     resp = templates_dynamodb.get_template(template_id)
     if not resp:
-        log.error('Template with id ' + template_id + ' does not exist')
+        log.error(f'Template with id {template_id} does not exist')
         return jsonify({'error': 'Template does not exist'}), http.HTTPStatus.NOT_FOUND
 
     file = templates_s3.get_file(Template.from_json(resp))
@@ -82,7 +82,7 @@ def get_template_file(template_id):
 def delete_template_file(template_id):
     resp = templates_dynamodb.get_template(template_id)
     if not resp:
-        log.error('Template with id ' + template_id + ' does not exist')
+        log.error(f'Template with id {template_id} does not exist')
         return jsonify({'error': 'Template does not exist'}), http.HTTPStatus.NOT_FOUND
     templates_s3.delete_file(Template.from_json(resp))
     return '', http.HTTPStatus.NO_CONTENT
