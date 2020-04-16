@@ -1,5 +1,8 @@
 from dataclasses import dataclass, field
 from dataclasses_json import dataclass_json
+import warnings
+
+warnings.filterwarnings("ignore", category=RuntimeWarning)
 
 
 @dataclass_json

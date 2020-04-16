@@ -1,10 +1,12 @@
 import json
+import logging
 import os
 
 import boto3
 
 BUCKET_NAME = os.environ.get('S3_BUCKET')
 IS_OFFLINE = os.environ.get('IS_OFFLINE')
+log = logging.getLogger()
 
 if IS_OFFLINE:
     s3 = boto3.resource(
@@ -31,7 +33,8 @@ def get_file(template):
         try:
             content = path.get()['Body'].read()
             return json.loads(content)
-        except:
+        except Exception as e:
+            log.error('Template not found in bucket', e)
             return None
 
 
