@@ -40,6 +40,25 @@ def create_template():
     return jsonify(template)
 
 
+@template_blueprint.route("/templates/<string:template_id>", methods=["PUT"])
+def update_template(template_id):
+    resp = templates_dynamodb.get_template(template_id)
+    if not resp:
+        log.error(f'Template with id {template_id} does not exist')
+        return jsonify({'error': 'Template does not exist'}), http.HTTPStatus.NOT_FOUND
+
+    template = Template.from_json(resp)
+    print(request.json)
+    default_parameters = request.json['defaultParameters']
+    print(default_parameters)
+    if not default_parameters or not isinstance(default_parameters, dict):
+        log.error(f'Bad request to update template with id {template_id}')
+        return jsonify({'error': 'To update template defaultParameters are required'}), http.HTTPStatus.BAD_REQUEST
+    template.defaultParameters = default_parameters
+    templates_dynamodb.update_template(template)
+    return jsonify(template)
+
+
 @template_blueprint.route("/templates/<string:template_id>", methods=["DELETE"])
 def delete_template(template_id):
     resp = templates_dynamodb.delete_template(template_id)

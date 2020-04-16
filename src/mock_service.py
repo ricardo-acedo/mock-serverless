@@ -61,7 +61,7 @@ def parse_query_parameter(parameter, str_file, query_parameters, user_parameters
     replacement = None
 
     if parameter_key in query_parameters:
-        replacement = query_parameters[parameter_key]
+        replacement = query_parameters[parameter_key][0]
     elif parameter in user_parameters:
         replacement = user_parameters[parameter]
     elif parameter in template_default_parameters:
