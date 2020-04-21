@@ -17,7 +17,7 @@ log = logging.getLogger()
 def mock():
     try:
         mock_request = MockRequest.from_dict(request.json)
-    except (KeyError, TypeError) as e:
+    except Exception as e:
         log.error('Error creating mock request', e)
         return jsonify({'error': 'Invalid request'}), http.HTTPStatus.BAD_REQUEST
 
