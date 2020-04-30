@@ -5,7 +5,8 @@ import re
 from src.aws import templates_dynamodb
 from src.model.dot_map import DotMap
 
-log = logging.getLogger()
+logger = logging.getLogger()
+logger.setLevel(logging.INFO)
 templates_reduced = templates_dynamodb.get_all_templates_path_index()
 
 
@@ -27,6 +28,7 @@ def search_template(mock_request):
 
 
 def parse_file(mock_request, json_file, template, user_parameters):
+    logger.info(f'Parsing mock request {mock_request}')
     str_file = json.dumps(json_file)
     for parameter in template.parameters:
         if parameter.startswith('query'):
@@ -44,6 +46,7 @@ def parse_file(mock_request, json_file, template, user_parameters):
 
 
 def parse_parameter(parameter, str_file, user_parameters, template_default_parameters):
+    logger.info(f'Parsing generic parameter {parameter}')
     replacement = None
 
     if parameter in user_parameters:
@@ -57,6 +60,7 @@ def parse_parameter(parameter, str_file, user_parameters, template_default_param
 
 
 def parse_query_parameter(parameter, str_file, query_parameters, user_parameters, template_default_parameters):
+    logger.info(f'Parsing query parameter {parameter}')
     parameter_key = parameter[6:]
     replacement = None
 
@@ -73,10 +77,12 @@ def parse_query_parameter(parameter, str_file, query_parameters, user_parameters
 
 
 def parse_path_parameter(parameter, str_file, path, template, user_parameters):
+    logger.info(f'Parsing path parameter {parameter}')
     parameter_key = '{{' + parameter[5:] + '}}'
     replacement = None
     template_path_list = template.path.split('/')
     path_list = path.split('/')
+
     if parameter_key in template_path_list:
         replacement = path_list[template_path_list.index(parameter_key)]
     elif parameter in user_parameters:
@@ -90,6 +96,7 @@ def parse_path_parameter(parameter, str_file, path, template, user_parameters):
 
 
 def parse_body_parameter(parameter, str_file, body, user_parameters, template_default_parameters):
+    logger.info(f'Parsing body parameter {parameter}')
     replacement = None
     if body:
         replacement = get_parameter_from_body(parameter[5:], body)
@@ -113,8 +120,8 @@ def get_parameter_from_body(parameter_key, body):
                 value = getattr(value, matcher.group(1)).__getitem__(int(matcher.group(2)))
             else:
                 value = getattr(value, key)
-        except Exception as e:
-            log.error(f'Parsed parameter {parameter_key} not found in body', e)
+        except Exception:
+            logger.exception(f'Parsed parameter {parameter_key} not found in body')
             value = None
             break
 

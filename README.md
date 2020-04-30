@@ -13,7 +13,7 @@ To use this project, you need to have install serverless and a AWS account in yo
 Install all npm dependencies
 
 ```bash
-npm install
+npm ci
 ```
 
 Then, we are goint to create a virtualenv for python3 and all its dependencias, if you don't have virtualenv, install it with npm.
@@ -46,10 +46,9 @@ sls dynamodb start
 
 ### S3 Local
 
-Same as with DynamoDB, we need to install and start S3. Create a /tmp folder in your machine if it doesn't exist. Once is started, you can access it in the /tmp/mock-server-templates folder of your machine.
+Same as with DynamoDB, we need to start S3. Create a /tmp folder in your machine if it doesn't exist. Once is started, you can access it in the /tmp/mock-server-templates folder of your machine.
 
 ```bash
-sls s3 install
 sls s3 start
 ```
 

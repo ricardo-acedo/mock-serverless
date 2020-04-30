@@ -10,25 +10,27 @@ from src.model.template import Template
 from src.model.user import User
 
 mock_blueprint = Blueprint('mock', __name__)
-log = logging.getLogger()
+logger = logging.getLogger()
+logger.setLevel(logging.INFO)
 
 
 @mock_blueprint.route("/mock", methods=["POST"])
 def mock():
     try:
+        logger.info(f'Trying to return mock response for request {request.json}')
         mock_request = MockRequest.from_dict(request.json)
-    except Exception as e:
-        log.error('Error creating mock request', e)
+    except (KeyError, TypeError):
+        logger.exception('Error creating mock request')
         return jsonify({'error': 'Invalid request'}), http.HTTPStatus.BAD_REQUEST
 
     user_json = users_dynamodb.get_user(mock_request.userId)
     if not user_json:
-        log.error(f'User id not found for request {mock_request.userId}')
+        logger.error(f'User id not found for request {mock_request.userId}')
         return jsonify({'error': f'User {mock_request.userId} not found'}), http.HTTPStatus.NOT_FOUND
 
     user = User.from_json(user_json)
     if not user.isMock:
-        log.warning(f'User {mock_request.userId} is not mock available')
+        logger.warning(f'User {mock_request.userId} is not mock available')
         return '', http.HTTPStatus.NO_CONTENT
 
     if not mock_request.httpStatus:
@@ -36,14 +38,14 @@ def mock():
 
     template_reduced = mock_service.search_template(mock_request)
     if not template_reduced:
-        log.error(f'Template id not found for path {mock_request.path} and http status response '
-                  f'{mock_request.httpStatus}')
+        logger.error(f'Template id not found for path {mock_request.path} and http status response '
+                     f'{mock_request.httpStatus}')
         return jsonify({'error': 'Template id not found'}), http.HTTPStatus.NOT_FOUND
 
     template = Template.from_json(templates_dynamodb.get_template(template_reduced['id']))
     file = templates_s3.get_file(template)
     if not file:
-        log.error(f"File not found for path {mock_request.path} and template id {template_reduced['id']}")
+        logger.error(f"File not found for path {mock_request.path} and template id {template_reduced['id']}")
         return jsonify({'error': 'File not found'}), http.HTTPStatus.NOT_FOUND
 
     if template.responseType == 'json':

@@ -22,7 +22,9 @@ if IS_OFFLINE:
 else:
     dynamodb = boto3.resource('dynamodb')
 
-log = logging.getLogger()
+logger = logging.getLogger()
+logger.setLevel(logging.INFO)
+
 table = dynamodb.Table(TEMPLATES_TABLE)
 
 
@@ -34,6 +36,7 @@ def query_path(path, http_status):
 
 
 def add_template(template):
+    logger.info(f'Adding template to DB {template}')
     if query_path(template.path, template.httpStatus):
         return None
 
@@ -44,12 +47,14 @@ def add_template(template):
 
 
 def update_template(template):
+    logger.info(f'Updating template to DB {template}')
     table.put_item(
         Item=template.to_dict()
     )
 
 
 def get_template(template_id):
+    logger.info(f'Getting template from DB id {template_id}')
     response = table.get_item(
         Key={
             'id': template_id
@@ -69,6 +74,7 @@ def get_all_templates_path_index():
 
 
 def delete_template(template_id):
+    logger.info(f'Deleting template from DB id {template_id}')
     response = table.delete_item(
         Key={
             'id': template_id

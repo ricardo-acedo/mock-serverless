@@ -40,13 +40,17 @@ provider:
         - dynamodb:UpdateItem
         - dynamodb:DeleteItem
       Resource:
-        - { "Fn::GetAtt": ["UsersDynamoDBTable", "Arn" ] }
-        - { "Fn::GetAtt": ["TemplatesDynamoDBTable", "Arn" ] }
+        - Fn::GetAtt: [ UsersDynamoDBTable, Arn ]
+        - Fn::GetAtt: [ TemplatesDynamoDBTable, Arn ]
+        - Fn::GetAtt: [ UsersDynamoDBTable, Arn ]
+        - Fn::Join: ['/', [Fn::GetAtt: [ TemplatesDynamoDBTable, Arn ], 'index', '${self:custom.templatesPathIndex}'] ]
     - Effect: Allow
       Action:
-        - s3:*
+        - s3:PutObject
+        - s3:DeleteObject
+        - s3:GetObject
       Resource:
-        - { "Fn::GetAtt": ["TemplatesS3Bucket", "Arn" ] }
+        - Fn::Join: ['', [Fn::GetAtt: [ TemplatesS3Bucket, Arn ], '/*'] ]
   environment:
     USERS_TABLE: ${self:custom.tableNameUsers}
     TEMPLATES_TABLE: ${self:custom.tableNameTemplates}

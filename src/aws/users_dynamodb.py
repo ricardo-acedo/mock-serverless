@@ -1,3 +1,4 @@
+import logging
 import os
 import boto3
 
@@ -5,6 +6,9 @@ from src.aws.decimal_encoder import parse_json
 
 USERS_TABLE = os.environ.get('USERS_TABLE')
 IS_OFFLINE = os.environ.get('IS_OFFLINE')
+
+logger = logging.getLogger()
+logger.setLevel(logging.INFO)
 
 if IS_OFFLINE:
     dynamodb = boto3.resource(
@@ -22,12 +26,14 @@ table = dynamodb.Table(USERS_TABLE)
 
 
 def add_user(user):
+    logger.info(f'Adding user to DB {user}')
     return table.put_item(
         Item=user.to_dict()
     )
 
 
 def get_user(user_id):
+    logger.info(f'Get user from DB with id {user_id}')
     response = table.get_item(
         Key={
             'id': user_id
@@ -43,6 +49,7 @@ def get_all_users():
 
 
 def delete_user(user_id):
+    logger.info(f'Deleting user from DB with id {user_id}')
     response = table.delete_item(
         Key={
             'id': user_id
